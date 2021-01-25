@@ -1,1 +1,1 @@
-# deep-reinforcement-learning-pedestrian-signal-design
+# deep-reinforcement-learning-optimal-pedestrian-signal-design

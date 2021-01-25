@@ -1,5 +1,5 @@
 # deep-reinforcement-learning-optimal-pedestrian-signal-design
-investigate the optimal control strategies at crosswalks using traffic signal controllers.  The proposed reinforcement learning framework is aimed to 
+This study is to investigate the optimal control strategies at crosswalks using traffic signal controllers.  The proposed reinforcement learning framework is aimed to 
 
 (1) find the optimal control policy that minimizes the number of conflicts (safety) while reducing traffic delay (efficiency), 
 

@@ -23,10 +23,10 @@ class TrafficGenerator:
         """
         Generation of the route of every car for one episode
         """
-        net = "intersection\\pedcrossing.net.xml"
+        net = "Intersection\pedcrossing.net.xml"
         randomTrips.main(randomTrips.get_options([
         '--net-file', net,
-        '--output-trip-file', 'intersection\\pedestrians.trip.xml',
+        '--output-trip-file', 'Intersection\pedestrians.trip.xml',
         '--seed', str(seed),  # make runs reproducible
         '--pedestrians',
         '--prefix', 'ped',

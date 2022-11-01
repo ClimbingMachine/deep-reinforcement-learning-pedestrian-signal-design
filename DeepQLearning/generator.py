@@ -23,7 +23,7 @@ class TrafficGenerator:
         """
         Generation of the route of every car for one episode
         """
-        net = "Intersection\pedcrossing.net.xml"
+        net = "./Intersection/pedcrossing.net.xml"
         randomTrips.main(randomTrips.get_options([
         '--net-file', net,
         '--output-trip-file', 'Intersection\pedestrians.trip.xml',

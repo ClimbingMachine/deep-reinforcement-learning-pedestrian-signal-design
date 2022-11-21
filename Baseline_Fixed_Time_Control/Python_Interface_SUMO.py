@@ -9,8 +9,8 @@ from __future__ import print_function
 
 import os
 import sys
-import optparse
-import subprocess
+from argparse import ArgumentParser
+import numpy as np
 
 
 # In[2]:
@@ -84,56 +84,63 @@ def run():
 
     sys.stdout.flush()
     traci.close()
-    return([total_ped_time, total_veh_time])
-        # phase for the vehicles exceeds its minimum duration
+    return [total_ped_time, total_veh_time]
+    # phase for the vehicles exceeds its minimum duration
 
 
 # In[6]:
 
 
 def get_queue_length():
-        """
-        Retrieve the number of cars with speed = 0 in every incoming lane
-        """
-        halt_EC = traci.edge.getLastStepHaltingNumber("EC")
-        halt_WC = traci.edge.getLastStepHaltingNumber("WC")
-        queue_length = halt_EC + halt_WC
-        return queue_length
+    """
+    Retrieve the number of cars with speed = 0 in every incoming lane
+    """
+    halt_EC = traci.edge.getLastStepHaltingNumber("EC")
+    halt_WC = traci.edge.getLastStepHaltingNumber("WC")
+    queue_length = halt_EC + halt_WC
+    return queue_length
 
 
 # In[7]:
 
 
 def get_waiting_ped():
-        """
-        Retrieve the number of peds with speed = 0 in every incoming lane
-        """
-        numWaiting = 0
-        for edge in WALKINGAREAS:
-            peds = traci.edge.getLastStepPersonIDs(edge)
-            for ped in peds:
-                if (traci.person.getWaitingTime(ped) > 0 and
-                    traci.person.getNextEdge(ped) in CROSSINGS):
-                    numWaiting = traci.trafficlight.getServedPersonCount(TLSID, PEDESTRIAN_GREEN_PHASE)
-        return numWaiting
+    """
+    Retrieve the number of peds with speed = 0 in every incoming lane
+    """
+    numWaiting = 0
+    for edge in WALKINGAREAS:
+        peds = traci.edge.getLastStepPersonIDs(edge)
+        for ped in peds:
+            if (traci.person.getWaitingTime(ped) > 0 and
+                traci.person.getNextEdge(ped) in CROSSINGS):
+                numWaiting = traci.trafficlight.getServedPersonCount(TLSID, PEDESTRIAN_GREEN_PHASE)
+    return numWaiting
 
 
 # In[8]:
 
 
-# this is the main entry point of this script
-pedwaiting = []
-vehwaiting = []
-if __name__ == "__main__":
+def main():
+    parser = ArgumentParser()
+    parser.add_argument('-b', '--binomial', type=int, default=5, help='max number of simultaneous arrivals')
+    parser.add_argument('-p', '--period', type=float, default=6, help='inverse of expected arrival rate')
+    parser.add_argument('-v', '--vehicle', type=str, default='mod', help='low/mod/high vehicle traffic')
+    parser.add_argument('-r', '--runs', type=int, default=100, help='number of runs')
+    args = parser.parse_args()
+
+    # this is the main entry point of this script
+    pedwaiting = []
+    vehwaiting = []
     
-    for i in range(1000):
+    for i in range(args.runs):
         sumoBinary = checkBinary('sumo')
         net = 'pedcrossing.net.xml'
         
         # generate the pedestrians for this simulation
         randomTrips.main(randomTrips.get_options([
         '--net-file', net,
-        '--output-trip-file', 'pedestrians.trip.xml',
+        '--output-trip-file', f'pedestrians.trip.{args.binomial}.{args.period}.{args.vehicle}.xml',
         '--seed', str(i),  # make runs reproducible
         '--pedestrians',
         '--prefix', 'ped',
@@ -141,12 +148,12 @@ if __name__ == "__main__":
         # prevent trips that start and end on the same edge
         '--min-distance', "1",
         '--trip-attributes', 'departPos="random" arrivalPos="random"',
-        '--binomial', '5',
-        '--period', '6']))
+        '--binomial', str(args.binomial),
+        '--period', str(args.period)]))
 
         # this is the normal way of using traci. sumo is started as a
         # subprocess and then the python script connects and runs
-        traci.start([sumoBinary, "-c", os.path.join('run.sumocfg')])
+        traci.start([sumoBinary, "-c", os.path.join(f'run_{args.vehicle}.sumocfg')])
         [pedestrian_waiting, veh_waiting] = run()
         pedwaiting.append(pedestrian_waiting)
         vehwaiting.append(veh_waiting)
@@ -159,45 +166,26 @@ if __name__ == "__main__":
 # In[9]:
 
 
-with open('ped_fixed_data_mod.txt', "w") as file:
-            for value in pedwaiting:
-                    file.write("%s\n" % value)
-                
-with open('veh_fixed_data_mod.txt', "w") as file:
-            for value in vehwaiting:
-                    file.write("%s\n" % value)
+    with open(f'ped_fixed_data_mod_{args.binomial}_{args.period}_{args.vehicle}.txt', "w") as file:
+                for value in pedwaiting:
+                        file.write("%s\n" % value)
+                    
+    with open(f'veh_fixed_data_mod_{args.binomial}_{args.period}_{args.vehicle}.txt', "w") as file:
+                for value in vehwaiting:
+                        file.write("%s\n" % value)
 
 
 # In[10]:
 
 
-totalwaiting = [pedwaiting[i] + vehwaiting[i] for i in range(len(vehwaiting))] 
-with open('total_fixed_data_mod.txt', "w") as file:
-            for value in totalwaiting:
-                    file.write("%s\n" % value)
+    totalwaiting = [pedwaiting[i] + vehwaiting[i] for i in range(len(vehwaiting))] 
+    with open('total_fixed_data_mod.txt', "w") as file:
+                for value in totalwaiting:
+                        file.write("%s\n" % value)
 
+    mean_veh_wait = np.mean(veh_waiting)
+    print(f'{mean_veh_wait = }')
 
-# In[11]:
-
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-
-# In[12]:
-
-
-np.mean(vehwaiting)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+if __name__ == "__main__":
+    main()
 

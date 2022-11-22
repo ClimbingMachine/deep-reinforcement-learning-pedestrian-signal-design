@@ -80,10 +80,10 @@
     </edge>
 
     <tlLogic id="C" type="static" programID="0" offset="0">
-        <phase duration="77" state="GGgGGgr"/>
+        <phase duration="25" state="GGgGGgr"/>
         <phase duration="3"  state="yyyyyyr"/>
-        <phase duration="5"  state="rrrrrrG"/>
-        <phase duration="5"  state="rrrrrrr"/>
+        <phase duration="2"  state="rrrrrrG"/>
+        <phase duration="25"  state="rrrrrrr"/>
     </tlLogic>
 
     <junction id="C" type="traffic_light" x="100.00" y="50.00" incLanes="NC_0 EC_0 EC_1 WC_0 WC_1 :C_w1_0" intLanes=":C_0_0 :C_0_1 :C_6_0 :C_3_0 :C_3_1 :C_7_0 :C_c0_0" shape="98.50,57.90 101.50,57.90 101.67,57.07 101.88,56.78 102.17,56.57 102.54,56.44 103.00,56.40 103.00,43.60 102.17,43.43 101.88,43.23 101.67,42.93 101.54,42.56 101.50,42.10 98.50,42.10 98.33,42.93 98.13,43.22 97.83,43.43 97.46,43.56 97.00,43.60 97.00,56.40 97.83,56.57 98.13,56.77 98.33,57.07 98.46,57.44">

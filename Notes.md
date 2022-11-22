@@ -81,9 +81,17 @@ Q-Learning can be used, and more actions can be added.
 - [x] Implement Fixed Time Control
 - [ ] Report Fixed Time Control results
 - [ ] Replicate DQN result
+  - [ ] Implement GPU with CUDA
 - [ ] Increase flow settings
   - [ ] e.g. high pedestrian, high vehicle
 - [ ] Report results of designs with figures
+
+* Q: How is the vehicle arrival rate configured?
+* A: In `pedcrossing.rou.xml`.
+
+## Installing CUDA
+
+Follow [installation guide](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html).
 
 # A2
 
@@ -122,3 +130,14 @@ $\epsilon\in[0,1]$, higher values correspond to more explorative behaviour, lowe
     \pi_\theta(s,a)=\frac{\exp Q_\theta(s,a)}{\sum_{a'}\exp Q_\theta(s,a')}
     $$
     Sample action $a\sim\pi_\theta(s,a)$.
+
+## Q4 Pedestrian/Vehicle Arrival
+
+Number of pedestrians at each time step modelled as binomial distribution, 
+with a maximum number n, and probability p of each pedestrian appearing.
+
+Number of vehicles at each time step modelled as Poisson distribution, 
+with arrival rate $\lambda$.
+
+Moderate pedestrians setting has $n=5,p=1/6$.
+Moderate vehicles setting has $\lambda=0.35/s$

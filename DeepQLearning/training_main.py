@@ -21,7 +21,6 @@ import traci
 # In[3]:
 
 
-import import_ipynb
 from training_simulation import Simulation
 from generator import TrafficGenerator
 from memory import Memory

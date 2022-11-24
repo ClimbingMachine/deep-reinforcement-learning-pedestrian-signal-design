@@ -142,6 +142,9 @@ with arrival rate $\lambda$.
 Moderate pedestrians setting has $n=5,p=1/6$.
 Moderate vehicles setting has $\lambda=0.35/s$
 
+## Q5 LQR or Deep RL?
+
+
 ## Q5 Optimizers
 
 Optimizers and their hyperparameters

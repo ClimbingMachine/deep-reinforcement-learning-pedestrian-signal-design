@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 class TDLearning:
     def __init__(self, batch_size, learning_rate, input_dim, output_dim):
@@ -6,38 +7,36 @@ class TDLearning:
         self._output_dim = output_dim
         self._batch_size = batch_size
         self._learning_rate = learning_rate
-        self._model = {}
+        self._q_table = np.zeros((input_dim, output_dim))
+
 
     def predict_one(self, state):
         """
         Predict the action values from a single state
         """
-        if state not in self._model:
-            self._model[state] = 0
-        return self._model[state]
-
+        return self._q_table[state]
 
     def predict_batch(self, states):
         """
         Predict the action values from a batch of states
         """
-        return self._model.predict(states)
+        return self._q_table[states]
 
 
     def train_batch(self, states, q_sa):
         """
-        Train the nn using the updated q-values
-        """
-        self._model.fit(states, q_sa, epochs=1, verbose=0)
+        Train td learning using the updated q-values
+        """ 
+        # TD Update
+        td_delta = q_sa - self.predict_batch(states)
+        self._q_table[states] += self._learning_rate * td_delta
 
 
     def save_model(self, path):
         """
-        Save the current model in the folder as h5 file and a model architecture summary as png
+        Save the current model in the folder as npy file
         """
-        self._model.save(os.path.join(path, 'trained_model.h5'))
-        # plot_model(self._model, to_file=os.path.join(path, 'model_structure.png'), show_shapes=True, show_layer_names=True)
-
+        np.save(os.path.join(path, 'q_table'), self._q_table)
 
     @property
     def input_dim(self):

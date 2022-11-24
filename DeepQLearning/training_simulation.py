@@ -250,13 +250,13 @@ class Simulation:
         if len(batch) > 0:  # if the memory is full enough
             states = np.array([val[0] for val in batch])  # extract states from the batch
             next_states = np.array([val[3] for val in batch])  # extract next states from the batch
-
+            
             # prediction
             q_s_a = self._Model.predict_batch(states)  # predict Q(state), for every sample
             q_s_a_d = self._Model.predict_batch(next_states)  # predict Q(next_state), for every sample
 
             # setup training arrays
-            x = np.zeros((len(batch), self._num_states))
+            x = np.zeros((len(batch), self._num_states), dtype=int)
             y = np.zeros((len(batch), self._num_actions))
 
             for i, b in enumerate(batch):

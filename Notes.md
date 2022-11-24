@@ -141,3 +141,12 @@ with arrival rate $\lambda$.
 
 Moderate pedestrians setting has $n=5,p=1/6$.
 Moderate vehicles setting has $\lambda=0.35/s$
+
+## Q5 Optimizers
+
+Optimizers and their hyperparameters
+* SGD - Learning Rate, Momentum, Nesterov
+* Adam - Learning Rate, $\beta_1, \beta_2$
+
+Default SGD sets `momentum=0, nesterov=False`.
+AdaGrad is Adam with $\beta_1=\beta_2=0$.

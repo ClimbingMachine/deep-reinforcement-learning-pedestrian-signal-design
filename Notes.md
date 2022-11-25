@@ -91,8 +91,24 @@ Q-Learning can be used, and more actions can be added.
 
 ## Installing CUDA
 
+Prerequisite: `conda`, NVIDIA GPU
+
 Follow [installation guide](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html).
 
+1. Create conda environment.
+    ```bash
+    conda create --name sumo python=3.9
+    conda activate sumo
+    ```
+1. Install `cudatoolkit`
+    ```bash
+    conda install -c conda-forge cudatoolkit cudnn
+    ```
+1. Install `tensorflow`
+    ```bash
+    pip install tensorflow tensorflow-gpu
+    ```
+    
 # A2
 
 ## Q1 Experience Replay
@@ -112,23 +128,29 @@ $\epsilon\in[0,1]$, higher values correspond to more explorative behaviour, lowe
 ## Q3 Other Policies
 
 1. Use exploration function $r^+$ with bonus $\mathcal{B}$
+
     $$
     r^+(s, a) = r(s,a) + \mathcal{B}(N(s))
     $$ 
 
     and take 
+
     $$
     a=\argmax_a r^+(s,a)
     $$
 
     UCB sets
+
     $$
     \mathcal{B}(N(s))=\sqrt{\frac{2\ln n}{N(s)}}
     $$
+
 1. Use softmax policy, given the Q-value function $Q_\theta(s,a)$
+
     $$
     \pi_\theta(s,a)=\frac{\exp Q_\theta(s,a)}{\sum_{a'}\exp Q_\theta(s,a')}
     $$
+
     Sample action $a\sim\pi_\theta(s,a)$.
 
 ## Q4 Pedestrian/Vehicle Arrival

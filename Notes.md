@@ -11,7 +11,8 @@ MDP can be represented by the tuple $(S,A,R,T)$ - States, Actions, Reward, Trans
 
 ### State
 $$
-s \in S_{ped} \times S_{veh}\\
+s \in S_{ped} \times S_{veh}
+$$$$
 S_{ped} = S_{veh} = \{0, ..., 9\}
 $$
 
@@ -32,7 +33,8 @@ In training, one-hot encoding representation is used.
 Total Cummulative Wait Time (TCWT)
 
 $$
-TCWT = \sum p_{ped} + p_{veh}\\
+TCWT = \sum p_{ped} + p_{veh}
+$$$$
 R_t = TCWT_{t-1} - TCWT_t
 $$
 
@@ -127,31 +129,33 @@ $\epsilon\in[0,1]$, higher values correspond to more explorative behaviour, lowe
 
 ## Q3 Other Policies
 
-1. Use exploration function $r^+$ with bonus $\mathcal{B}$
+### Exploration Function
+Use exploration function $r^+$ with bonus $\mathcal{B}$
 
-    $$
-    r^+(s, a) = r(s,a) + \mathcal{B}(N(s))
-    $$ 
+$$
+r^+(s, a) = r(s,a) + \mathcal{B}(N(s))
+$$ 
 
-    and take 
+and take 
 
-    $$
-    a=\argmax_a r^+(s,a)
-    $$
+$$
+a=\argmax_a r^+(s,a)
+$$
 
-    UCB sets
+UCB sets
 
-    $$
-    \mathcal{B}(N(s))=\sqrt{\frac{2\ln n}{N(s)}}
-    $$
+$$
+\mathcal{B}(N(s))=\sqrt{\frac{2\ln n}{N(s)}}
+$$
 
-1. Use softmax policy, given the Q-value function $Q_\theta(s,a)$
+### Softmax Policy
+Use softmax policy, given the Q-value function $Q_\theta(s,a)$
 
-    $$
-    \pi_\theta(s,a)=\frac{\exp Q_\theta(s,a)}{\sum_{a'}\exp Q_\theta(s,a')}
-    $$
+$$
+\pi_\theta(s,a)=\frac{\exp Q_\theta(s,a)}{\sum_{a'}\exp Q_\theta(s,a')}
+$$
 
-    Sample action $a\sim\pi_\theta(s,a)$.
+Sample action $a\sim\pi_\theta(s,a)$.
 
 ## Q4 Pedestrian/Vehicle Arrival
 
@@ -166,6 +170,7 @@ Moderate vehicles setting has $\lambda=0.35/s$
 
 ## Q5 LQR or Deep RL?
 
+LQR is model-based RL.
 
 ## Q5 Optimizers
 

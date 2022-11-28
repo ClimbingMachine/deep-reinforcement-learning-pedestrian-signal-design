@@ -12,7 +12,8 @@ MDP can be represented by the tuple $(S,A,R,T)$ - States, Actions, Reward, Trans
 ### State
 $$
 s \in S_{ped} \times S_{veh}
-$$$$
+$$
+$$
 S_{ped} = S_{veh} = \{0, ..., 9\}
 $$
 
@@ -34,7 +35,8 @@ Total Cummulative Wait Time (TCWT)
 
 $$
 TCWT = \sum p_{ped} + p_{veh}
-$$$$
+$$
+$$
 R_t = TCWT_{t-1} - TCWT_t
 $$
 
@@ -81,9 +83,9 @@ Q-Learning can be used, and more actions can be added.
 - [x] Briefly read `traci`
 - [x] Read 2.2.3 Dissertation on Control Types
 - [x] Implement Fixed Time Control
-- [ ] Report Fixed Time Control results
-- [ ] Replicate DQN result
-  - [ ] Implement GPU with CUDA
+- [x] Report Fixed Time Control results
+- [x] Replicate DQN result
+  - [x] Implement GPU with CUDA
 - [ ] Increase flow settings
   - [ ] e.g. high pedestrian, high vehicle
 - [ ] Report results of designs with figures
@@ -170,9 +172,12 @@ Moderate vehicles setting has $\lambda=0.35/s$
 
 ## Q5 LQR or Deep RL?
 
-LQR is model-based RL.
+LQR is model-based RL. 
+It requires the dynamics of the environment to be known.
 
-## Q5 Optimizers
+Deep RL is typically model-free, where the transition model of the environment is unknown.
+
+## Q6 Optimizers
 
 Optimizers and their hyperparameters
 * SGD - Learning Rate, Momentum, Nesterov

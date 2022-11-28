@@ -13,6 +13,7 @@ MDP can be represented by the tuple $(S,A,R,T)$ - States, Actions, Reward, Trans
 $$
 s \in S_{ped} \times S_{veh}
 $$
+
 $$
 S_{ped} = S_{veh} = \{0, ..., 9\}
 $$
@@ -36,6 +37,7 @@ Total Cummulative Wait Time (TCWT)
 $$
 TCWT = \sum p_{ped} + p_{veh}
 $$
+
 $$
 R_t = TCWT_{t-1} - TCWT_t
 $$
@@ -141,7 +143,7 @@ $$
 and take 
 
 $$
-a=\argmax_a r^+(s,a)
+a=\arg\max_a r^+(s,a)
 $$
 
 UCB sets
@@ -185,3 +187,17 @@ Optimizers and their hyperparameters
 
 Default SGD sets `momentum=0, nesterov=False`.
 AdaGrad is Adam with $\beta_1=\beta_2=0$.
+
+# Policy Results
+
+Delay plot from $\epsilon$-greedy policy.
+
+![epsilon](DeepQLearning/saved_models/model_egreedy/plot_delay.png)
+
+Delay plot from softmax policy.
+
+![softmax](DeepQLearning/saved_models/model_softmax/plot_delay.png)
+
+It can be seen that using the softmax policy converges more quickly.
+This could be attributed to the stochasticity of the environment
+being more quickly found by a stochastic policy rather than a deterministic one.

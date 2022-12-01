@@ -140,7 +140,7 @@ def main():
         # generate the pedestrians for this simulation
         randomTrips.main(randomTrips.get_options([
         '--net-file', net,
-        '--output-trip-file', f'pedestrians.trip.{args.binomial}.{args.period}.{args.vehicle}.xml',
+        '--output-trip-file', f'pedestrians.trip.xml',
         '--seed', str(i),  # make runs reproducible
         '--pedestrians',
         '--prefix', 'ped',
@@ -154,36 +154,35 @@ def main():
         # this is the normal way of using traci. sumo is started as a
         # subprocess and then the python script connects and runs
         traci.start([sumoBinary, "-c", os.path.join(f'run_{args.vehicle}.sumocfg')])
-        [pedestrian_waiting, veh_waiting] = run()
-        pedwaiting.append(pedestrian_waiting)
-        vehwaiting.append(veh_waiting)
+        [pedestrian_waiting_time, veh_waiting_time] = run()
+        pedwaiting.append(pedestrian_waiting_time)
+        vehwaiting.append(veh_waiting_time)
         
-        print("Iteration %s: pedestrian waiting time- %s and vehicle waiting time - %s)" %
-                  (i, pedestrian_waiting, veh_waiting))
+        print(f"Iteration {i}: {pedestrian_waiting_time = } and {veh_waiting_time = }")
         
 
 
 # In[9]:
 
 
-    with open(f'ped_fixed_data_mod_{args.binomial}_{args.period}_{args.vehicle}.txt', "w") as file:
-                for value in pedwaiting:
-                        file.write("%s\n" % value)
+    with open(f'ped_fixed_data_{args.vehicle}_{args.binomial}_{args.period}.txt', "w") as file:
+        for value in pedwaiting:
+            file.write(f"{value}\n")
                     
-    with open(f'veh_fixed_data_mod_{args.binomial}_{args.period}_{args.vehicle}.txt', "w") as file:
-                for value in vehwaiting:
-                        file.write("%s\n" % value)
+    with open(f'veh_fixed_data_{args.vehicle}_{args.binomial}_{args.period}.txt', "w") as file:
+        for value in vehwaiting:
+            file.write(f"{value}\n")
 
 
 # In[10]:
 
 
     totalwaiting = [pedwaiting[i] + vehwaiting[i] for i in range(len(vehwaiting))] 
-    with open('total_fixed_data_mod.txt', "w") as file:
-                for value in totalwaiting:
-                        file.write("%s\n" % value)
+    with open(f'total_fixed_data_{args.vehicle}_{args.binomial}_{args.period}.txt', "w") as file:
+        for value in totalwaiting:
+            file.write(f"{value}\n")
 
-    mean_veh_wait = np.mean(veh_waiting)
+    mean_veh_wait = np.mean(vehwaiting)
     print(f'{mean_veh_wait = }')
 
 if __name__ == "__main__":

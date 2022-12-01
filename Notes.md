@@ -88,9 +88,9 @@ Q-Learning can be used, and more actions can be added.
 - [x] Report Fixed Time Control results
 - [x] Replicate DQN result
   - [x] Implement GPU with CUDA
-- [ ] Increase flow settings
-  - [ ] e.g. high pedestrian, high vehicle
-- [ ] Report results of designs with figures
+- [x] Increase flow settings
+  - [x] e.g. high pedestrian, high vehicle
+- [x] Report results of designs with figures
 
 * Q: How is the vehicle arrival rate configured?
 * A: In `pedcrossing.rou.xml`.
@@ -188,16 +188,21 @@ Optimizers and their hyperparameters
 Default SGD sets `momentum=0, nesterov=False`.
 AdaGrad is Adam with $\beta_1=\beta_2=0$.
 
+## Tasks
+
+- [x] Replicate results & figures
+- [ ] Prepare 20 slides - <20 words per slide
+  - [ ] Problem statement
+- [ ] LQR Analytical Solution
+
 # Policy Results
 
-Delay plot from $\epsilon$-greedy policy.
+The plot below shows the TCWT over iterations from Fixed, Adaptive, and RL-trained Controls. RL made use of the 3 types of policy choices in training.
 
-![epsilon](DeepQLearning/saved_models/model_egreedy/plot_delay.png)
+![delay](combined_TCWT.png)
 
-Delay plot from softmax policy.
 
-![softmax](DeepQLearning/saved_models/model_softmax/plot_delay.png)
-
-It can be seen that using the softmax policy converges more quickly.
+It can be seen that using the softmax and exploration policy choices 
+converge more quickly than $\epsilon$-greedy.
 This could be attributed to the stochasticity of the environment
-being more quickly found by a stochastic policy rather than a deterministic one.
+being more quickly learned by a stochastic policy rather than a deterministic one.

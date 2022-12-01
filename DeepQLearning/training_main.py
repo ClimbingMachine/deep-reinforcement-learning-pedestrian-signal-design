@@ -23,6 +23,7 @@ import traci
 
 from training_simulation import Simulation
 from training_simulation_bm import SimulationSoftmax
+from training_simulation_exp import SimulationExploration
 from generator import TrafficGenerator
 from memory import Memory
 from model import TrainModel
@@ -63,7 +64,7 @@ if __name__ == "__main__":
         dpi=96
     )
         
-    Simulation = SimulationSoftmax(
+    Simulation = Simulation(
         Model,
         Memory,
         TrafficGen,
@@ -73,6 +74,7 @@ if __name__ == "__main__":
         config['green_duration'],
         config['yellow_duration'],
         config['num_states'],
+        config['num_feats'],
         config['num_actions'],
         config['training_epochs']
     )

@@ -21,7 +21,7 @@ PHASE_VEH_YELLOW = 3
 
 
 class Simulation:
-    def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
+    def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_feats, num_actions, training_epochs):
         self._Model = Model
         self._Memory = Memory
         self._TrafficGen = TrafficGen
@@ -32,6 +32,7 @@ class Simulation:
         self._green_duration = green_duration
         self._yellow_duration = yellow_duration
         self._num_states = num_states
+        self._num_feats = num_feats
         self._num_actions = num_actions
         self._reward_store = []
         self._cumulative_wait_store = []
@@ -213,7 +214,7 @@ class Simulation:
         """
         WALKINGAREAS = [':C_w0', ':C_w1']
         CROSSINGS = [':C_c0'] 
-        state = np.zeros(self._num_states)
+        state = np.zeros(self._num_feats)
         halt_EC = traci.edge.getLastStepHaltingNumber("EC")
         halt_WC = traci.edge.getLastStepHaltingNumber("WC")
         # halt_E = traci.edge.getLastStepHaltingNumber("E2TL")
@@ -256,7 +257,7 @@ class Simulation:
             q_s_a_d = self._Model.predict_batch(next_states)  # predict Q(next_state), for every sample
 
             # setup training arrays
-            x = np.zeros((len(batch), self._num_states), dtype=int)
+            x = np.zeros((len(batch), self._num_feats), dtype=int)
             y = np.zeros((len(batch), self._num_actions))
 
             for i, b in enumerate(batch):

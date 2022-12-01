@@ -6,12 +6,10 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-
+from argparse import ArgumentParser
 
 import os
 import sys
-import optparse
-import subprocess
 
 
 # In[2]:
@@ -91,30 +89,30 @@ def run():
 
 
 def get_queue_length():
-        """
-        Retrieve the number of cars with speed = 0 in every incoming lane
-        """
-        halt_EC = traci.edge.getLastStepHaltingNumber("EC")
-        halt_WC = traci.edge.getLastStepHaltingNumber("WC")
-        queue_length = halt_EC + halt_WC
-        return queue_length
+    """
+    Retrieve the number of cars with speed = 0 in every incoming lane
+    """
+    halt_EC = traci.edge.getLastStepHaltingNumber("EC")
+    halt_WC = traci.edge.getLastStepHaltingNumber("WC")
+    queue_length = halt_EC + halt_WC
+    return queue_length
 
 
 # In[6]:
 
 
 def get_waiting_ped():
-        """
-        Retrieve the number of peds with speed = 0 in every incoming lane
-        """
-        numWaiting = 0
-        for edge in WALKINGAREAS:
-            peds = traci.edge.getLastStepPersonIDs(edge)
-            for ped in peds:
-                if (traci.person.getWaitingTime(ped) == 1 and
-                    traci.person.getNextEdge(ped) in CROSSINGS):
-                    numWaiting = traci.trafficlight.getServedPersonCount(TLSID, PEDESTRIAN_GREEN_PHASE)
-        return numWaiting
+    """
+    Retrieve the number of peds with speed = 0 in every incoming lane
+    """
+    numWaiting = 0
+    for edge in WALKINGAREAS:
+        peds = traci.edge.getLastStepPersonIDs(edge)
+        for ped in peds:
+            if (traci.person.getWaitingTime(ped) == 1 and
+                traci.person.getNextEdge(ped) in CROSSINGS):
+                numWaiting = traci.trafficlight.getServedPersonCount(TLSID, PEDESTRIAN_GREEN_PHASE)
+    return numWaiting
 
 
 # In[7]:
@@ -144,13 +142,12 @@ def checkWaitingPersons():
 
 # In[8]:
 
-
-# this is the main entry point of this script
-pedwaiting = []
-vehwaiting = []
-if __name__ == "__main__":
-    
-    for i in range(20):
+ 
+def run_cli(args):        
+    # this is the main entry point of this script
+    pedwaiting = []
+    vehwaiting = []
+    for i in range(args.runs):
         sumoBinary = checkBinary('sumo')
         net = 'pedcrossing.net.xml'
         
@@ -165,41 +162,41 @@ if __name__ == "__main__":
         # prevent trips that start and end on the same edge
         '--min-distance', "1",
         '--trip-attributes', 'departPos="random" arrivalPos="random"',
-        '--binomial', '5',
-        '--period', '6']))
+        '--binomial', str(args.binomial),
+        '--period', str(args.period)]))
 
         # this is the normal way of using traci. sumo is started as a
         # subprocess and then the python script connects and runs
         traci.start([sumoBinary, "-c", os.path.join('run_adapt.sumocfg')])
-        [pedestrian_waiting, veh_waiting] = run()
-        pedwaiting.append(pedestrian_waiting)
-        vehwaiting.append(veh_waiting)
-        print("Iteration %s: pedestrian waiting time- %s and vehicle waiting time - %s)" %
-                  (i, pedestrian_waiting, veh_waiting))
+        [pedestrian_waiting_time, veh_waiting_time] = run()
+        pedwaiting.append(pedestrian_waiting_time)
+        vehwaiting.append(veh_waiting_time)
         
+        print(f"Iteration {i}: {pedestrian_waiting_time = } and {veh_waiting_time = }")
+            
 
 
-# In[9]:
+    # In[9]:
 
 
-with open('ped_adapt_data_moderate.txt', "w") as file:
-            for value in pedwaiting:
-                    file.write("%s\n" % value)
-                
-with open('veh_adapt_data_moderate.txt', "w") as file:
-            for value in vehwaiting:
-                    file.write("%s\n" % value)
-                
-totalwaiting = [pedwaiting[i] + vehwaiting[i] for i in range(len(vehwaiting))] 
-with open('total_adapt_data_moderate.txt', "w") as file:
-            for value in totalwaiting:
-                    file.write("%s\n" % value)
+    with open(f'ped_adapt_data_moderate_{args.binomial}_{args.period}.txt', "w") as file:
+        for value in pedwaiting:
+            file.write(f"{value}\n")
+                    
+    with open(f'veh_adapt_data_moderate_{args.binomial}_{args.period}.txt', "w") as file:
+        for value in vehwaiting:
+            file.write(f"{value}\n")
+                    
+    totalwaiting = [pedwaiting[i] + vehwaiting[i] for i in range(len(vehwaiting))] 
+    with open(f'total_adapt_data_moderate_{args.binomial}_{args.period}.txt', "w") as file:
+        for value in totalwaiting:
+            file.write(f"{value}\n")
 
 
 # In[ ]:
 
 
-if __name__ == "__main__":
+def run_gui(args):
     sumoBinary = checkBinary('sumo-gui')
     net = 'pedcrossing.net.xml'
         
@@ -214,23 +211,29 @@ if __name__ == "__main__":
         # prevent trips that start and end on the same edge
         '--min-distance', "1",
         '--trip-attributes', 'departPos="random" arrivalPos="random"',
-        '--binomial', '5',
-        '--period', '10']))
+        '--binomial', str(args.binomial),
+        '--period', str(args.period)]))
 
         # this is the normal way of using traci. sumo is started as a
         # subprocess and then the python script connects and runs
     traci.start([sumoBinary, "-c", os.path.join('run_adapt.sumocfg')])
     run()
 
+def main():
+    parser = ArgumentParser()
+    parser.add_argument('-b', '--binomial', type=int, default=5, help='max number of simultaneous arrivals')
+    parser.add_argument('-p', '--period', type=float, default=6, help='inverse of expected arrival rate')
+    parser.add_argument('-v', '--vehicle', type=str, default='mod', help='low/mod/high vehicle traffic')
+    parser.add_argument('-r', '--runs', type=int, default=100, help='number of runs')
+    parser.add_argument('-g', '--gui', action='store_true')
+    args = parser.parse_args()
 
-# In[ ]:
+    if args.gui:
+        run_gui(args)
+    else:
+        run_cli(args)
 
-
-
-
-
-# In[ ]:
-
-
+if __name__ == '__main__':
+    main()
 
 

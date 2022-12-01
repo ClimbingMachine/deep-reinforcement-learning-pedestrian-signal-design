@@ -64,7 +64,7 @@ if __name__ == "__main__":
         dpi=96
     )
         
-    Simulation = Simulation(
+    Simulation = SimulationSoftmax(
         Model,
         Memory,
         TrafficGen,

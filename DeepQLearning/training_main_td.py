@@ -21,7 +21,7 @@ import traci
 # In[3]:
 
 
-from training_simulation_td import SimulationTD
+from training_simulation_exp import SimulationExploration
 from generator import TrafficGenerator
 from memory import Memory
 from td_learning import TDLearning
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         dpi=96
     )
         
-    Simulation = SimulationTD(
+    Simulation = SimulationExploration(
         Model,
         Memory,
         TrafficGen,
@@ -70,6 +70,7 @@ if __name__ == "__main__":
         config['green_duration'],
         config['yellow_duration'],
         config['num_states'],
+        config['num_feats'],
         config['num_actions'],
         config['training_epochs']
     )

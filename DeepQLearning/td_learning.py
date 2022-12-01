@@ -9,18 +9,23 @@ class TDLearning:
         self._learning_rate = learning_rate
         self._q_table = np.zeros((input_dim, output_dim))
 
+    def _get_state_idx(self, state):
+        lane_group, lane_cell = state
+        return 10 * lane_group + lane_cell
 
     def predict_one(self, state):
         """
         Predict the action values from a single state
         """
-        return self._q_table[state]
+        state_idx = self._get_state_idx(state)
+        return self._q_table[state_idx]
 
     def predict_batch(self, states):
         """
         Predict the action values from a batch of states
         """
-        return self._q_table[states]
+        state_idxs = np.array([self._get_state_idx(state) for state in states])
+        return self._q_table[state_idxs]
 
 
     def train_batch(self, states, q_sa):
@@ -28,8 +33,9 @@ class TDLearning:
         Train td learning using the updated q-values
         """ 
         # TD Update
-        td_delta = q_sa - self.predict_batch(states)
-        self._q_table[states] += self._learning_rate * td_delta
+        state_idxs = np.array([self._get_state_idx(state) for state in states])
+        td_delta = q_sa - self._q_table[state_idxs]
+        self._q_table[state_idxs] += self._learning_rate * td_delta
 
 
     def save_model(self, path):

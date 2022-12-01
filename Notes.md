@@ -131,10 +131,19 @@ Greedy action is chosen in the final model.
 
 $\epsilon\in[0,1]$, higher values correspond to more explorative behaviour, lower values correspond to more exploitative behaviour. Can be lowered over time like in $\epsilon=1/t$ to eventually be optimal in greedy behaviour.
 
+In the paper, $\epsilon$ is linearly annealed over time as follows.
+
+$$
+\epsilon = 1 - \frac{e}{E},
+$$
+
+where e is the current episode, and E is the total number of episodes trained.
+
 ## Q3 Other Policies
 
 ### Exploration Function
 Use exploration function $r^+$ with bonus $\mathcal{B}$
+where $N(s)$ is the number of times state s is visited in the episode.
 
 $$
 r^+(s, a) = r(s,a) + \mathcal{B}(N(s))
@@ -191,8 +200,10 @@ AdaGrad is Adam with $\beta_1=\beta_2=0$.
 ## Tasks
 
 - [x] Replicate results & figures
+- [ ] Smart Control Strategy for Traffic Signal
 - [ ] Prepare 20 slides - <20 words per slide
   - [ ] Problem statement
+- [ ] Future Directions
 - [ ] LQR Analytical Solution
 
 # Policy Results
@@ -204,5 +215,5 @@ The plot below shows the TCWT over iterations from Fixed, Adaptive, and RL-train
 
 It can be seen that using the softmax and exploration policy choices 
 converge more quickly than $\epsilon$-greedy.
-This could be attributed to the stochasticity of the environment
-being more quickly learned by a stochastic policy rather than a deterministic one.
+This could be attributed to the linear annealing being done on $\epsilon$
+slowing convergence to the more optimal greedy policy.

@@ -100,13 +100,13 @@ class Simulation:
         self._save_episode_stats()
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
         traci.close()
-        simulation_time = round(timeit.default_timer() - start_time, 1)
+        simulation_time = round(timeit.default_timer() - start_time, 3)
 
         print("Training...")
         start_time = timeit.default_timer()
         for _ in range(self._training_epochs):
             self._replay()
-        training_time = round(timeit.default_timer() - start_time, 1)
+        training_time = round(timeit.default_timer() - start_time, 3)
 
         return simulation_time, training_time
 

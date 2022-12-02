@@ -200,20 +200,31 @@ AdaGrad is Adam with $\beta_1=\beta_2=0$.
 ## Tasks
 
 - [x] Replicate results & figures
-- [ ] Smart Control Strategy for Traffic Signal
+- [x] Smart Control Strategy for Traffic Signal
 - [ ] Prepare 20 slides - <20 words per slide
   - [ ] Problem statement
 - [ ] Future Directions
 - [ ] LQR Analytical Solution
 
+## Misc
+
+* [nuPlan Challenge](https://www.nuscenes.org/nuplan#challenge)
+* [Jieping Ye](https://scholar.google.com/citations?user=T9AzhwcAAAAJ&hl=en) - Ride-Hailing RL
+
 # Policy Results
 
-The plot below shows the TCWT over iterations from Fixed, Adaptive, and RL-trained Controls. RL made use of the 3 types of policy choices in training.
+The plot below shows the TCWT over iterations from Fixed, Adaptive, and RL-trained Controls. Both tabular and Deep RL were investigated, and made use of the 3 types of policy choices in training.
 
-![delay](combined_TCWT.png)
+![delay_dqn](combined_TCWT_DQN.png)
+
+![delay_tbl](combined_TCWT_Qtable.png)
 
 
 It can be seen that using the softmax and exploration policy choices 
 converge more quickly than $\epsilon$-greedy.
 This could be attributed to the linear annealing being done on $\epsilon$
 slowing convergence to the more optimal greedy policy.
+
+Q-Table also performs much faster than DQN, taking 0.06s per iteration compared to 15s. 
+This is as expected, since the neural network takes computation time, 
+as opposed to the TD equation used for tabular learning.

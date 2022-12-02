@@ -20,8 +20,9 @@ import traci
 
 # In[3]:
 
-
+from training_simulation import Simulation
 from training_simulation_exp import SimulationExploration
+from training_simulation_bm import SimulationSoftmax
 from generator import TrafficGenerator
 from memory import Memory
 from td_learning import TDLearning
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         dpi=96
     )
         
-    Simulation = SimulationExploration(
+    Simulation = Simulation(
         Model,
         Memory,
         TrafficGen,

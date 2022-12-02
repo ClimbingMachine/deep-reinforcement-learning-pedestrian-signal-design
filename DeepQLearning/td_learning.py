@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import sys
 
 class TDLearning:
     def __init__(self, batch_size, learning_rate, input_dim, output_dim):
@@ -57,3 +58,20 @@ class TDLearning:
     @property
     def batch_size(self):
         return self._batch_size
+
+class TDLearningTest(TDLearning):
+    def __init__(self, input_dim, model_path):
+        super().__init__(1, 0, input_dim, 1)
+        self._q_table = self._load_my_model(model_path)
+
+    def _load_my_model(self, model_folder_path):
+        """
+        Load the model stored in the folder specified by the model number, if it exists
+        """
+        model_file_path = os.path.join(model_folder_path, 'q_table.npy')
+        
+        if os.path.isfile(model_file_path):
+            loaded_model = np.load(model_file_path)
+            return loaded_model
+        else:
+            sys.exit("Model number not found")

@@ -215,9 +215,9 @@ AdaGrad is Adam with $\beta_1=\beta_2=0$.
 
 The plot below shows the TCWT over iterations from Fixed, Adaptive, and RL-trained Controls. Both tabular and Deep RL were investigated, and made use of the 3 types of policy choices in training.
 
-![delay_dqn](combined_TCWT_DQN.png)
+![delay_dqn](diagrams/combined_TCWT_DQN.png)
 
-![delay_tbl](combined_TCWT_Qtable.png)
+![delay_tbl](diagrams/combined_TCWT_Qtable.png)
 
 
 It can be seen that using the softmax and exploration policy choices 

@@ -1,6 +1,0 @@
-<tlLogic id="C" type="static" programID="custom" offset="0">
-     <phase duration="25" state="GGgGGgr"/> <!-- do not switch vehicle phase automatically -->
-     <phase duration="3" state="yyyyyyr"/>
-     <phase duration="2" state="rrrrrrr"/>
-     <phase duration="25" state="rrrrrrG"/> <!-- give pedestrians time to clear the intersection -->
-</tlLogic>

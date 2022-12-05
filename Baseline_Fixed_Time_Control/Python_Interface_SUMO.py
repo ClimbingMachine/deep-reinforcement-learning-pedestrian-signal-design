@@ -28,6 +28,14 @@ import randomTrips  # noqa
 
 # In[3]:
 
+# directory of this script
+CONTROL_FOLDER = 'Baseline_Fixed_Time_Control'
+DATA_FOLDER = os.path.join(CONTROL_FOLDER, 'data')
+# directory of sumocfg
+SUMOCFG_FOLDER = os.path.join('sumo_config', 'simple_crosswalk')
+# config files for sumo
+NET_FILE = os.path.join(SUMOCFG_FOLDER, 'pedcrossing.net.xml')
+OUTPUT_TRIP_FILE = os.path.join(DATA_FOLDER,'pedestrians.trip.xml')
 
 MIN_GREEN_TIME = 25
 # the first phase in tls plan. see 'pedcrossing.tll.xml'
@@ -135,12 +143,11 @@ def main():
     
     for i in range(args.runs):
         sumoBinary = checkBinary('sumo')
-        net = 'pedcrossing.net.xml'
         
         # generate the pedestrians for this simulation
         randomTrips.main(randomTrips.get_options([
-        '--net-file', net,
-        '--output-trip-file', f'pedestrians.trip.xml',
+        '--net-file', NET_FILE,
+        '--output-trip-file', OUTPUT_TRIP_FILE,
         '--seed', str(i),  # make runs reproducible
         '--pedestrians',
         '--prefix', 'ped',
@@ -153,32 +160,33 @@ def main():
 
         # this is the normal way of using traci. sumo is started as a
         # subprocess and then the python script connects and runs
-        traci.start([sumoBinary, "-c", os.path.join(f'run_{args.vehicle}.sumocfg')])
+        traci.start([sumoBinary, "-c", os.path.join(SUMOCFG_FOLDER, f'run_{args.vehicle}.sumocfg')])
         [pedestrian_waiting_time, veh_waiting_time] = run()
         pedwaiting.append(pedestrian_waiting_time)
         vehwaiting.append(veh_waiting_time)
         
         print(f"Iteration {i}: {pedestrian_waiting_time = } and {veh_waiting_time = }")
-        
 
 
-# In[9]:
+    # In[9]:
 
+    totalwaiting = [ped + veh for ped, veh in zip(pedwaiting, vehwaiting)] 
 
-    with open(f'ped_fixed_data_{args.vehicle}_{args.binomial}_{args.period}.txt', "w") as file:
+    CONFIG_NAME = f'fixed_data_{args.vehicle}_{args.binomial}_{args.period}'
+
+    PED_FILE = os.path.join(DATA_FOLDER, f'ped_{CONFIG_NAME}.txt')
+    VEH_FILE = os.path.join(DATA_FOLDER, f'veh_{CONFIG_NAME}.txt')
+    TOT_FILE = os.path.join(DATA_FOLDER, f'tot_{CONFIG_NAME}.txt')
+
+    with open(PED_FILE, "w") as file:
         for value in pedwaiting:
             file.write(f"{value}\n")
                     
-    with open(f'veh_fixed_data_{args.vehicle}_{args.binomial}_{args.period}.txt', "w") as file:
+    with open(VEH_FILE, "w") as file:
         for value in vehwaiting:
             file.write(f"{value}\n")
-
-
-# In[10]:
-
-
-    totalwaiting = [pedwaiting[i] + vehwaiting[i] for i in range(len(vehwaiting))] 
-    with open(f'total_fixed_data_{args.vehicle}_{args.binomial}_{args.period}.txt', "w") as file:
+                    
+    with open(TOT_FILE, "w") as file:
         for value in totalwaiting:
             file.write(f"{value}\n")
 

@@ -27,6 +27,14 @@ import randomTrips  # noqa
 
 # In[3]:
 
+# directory of this script
+CONTROL_FOLDER = 'Adaptive Pedestrian Signal'
+DATA_FOLDER = os.path.join(CONTROL_FOLDER, 'data')
+# directory of sumocfg
+SUMOCFG_FOLDER = os.path.join('sumo_config', 'simple_crosswalk')
+# config files for sumo
+NET_FILE = os.path.join(SUMOCFG_FOLDER, 'pedcrossing.net.xml')
+OUTPUT_TRIP_FILE = os.path.join(DATA_FOLDER,'pedestrians.trip.xml')
 
 # minimum green time for the vehicles
 MIN_GREEN_TIME = 25
@@ -140,21 +148,11 @@ def checkWaitingPersons():
     return False
 
 
-# In[8]:
-
- 
-def run_cli(args):        
-    # this is the main entry point of this script
-    pedwaiting = []
-    vehwaiting = []
-    for i in range(args.runs):
-        sumoBinary = checkBinary('sumo')
-        net = 'pedcrossing.net.xml'
-        
-        # generate the pedestrians for this simulation
-        randomTrips.main(randomTrips.get_options([
-        '--net-file', net,
-        '--output-trip-file', 'pedestrians.trip.xml',
+def setup_traci(args, i=42):    
+    # generate the pedestrians for this simulation
+    randomTrips.main(randomTrips.get_options([
+        '--net-file', NET_FILE,
+        '--output-trip-file', OUTPUT_TRIP_FILE,
         '--seed', str(i),  # make runs reproducible
         '--pedestrians',
         '--prefix', 'ped',
@@ -163,32 +161,51 @@ def run_cli(args):
         '--min-distance', "1",
         '--trip-attributes', 'departPos="random" arrivalPos="random"',
         '--binomial', str(args.binomial),
-        '--period', str(args.period)]))
+        '--period', str(args.period)]
+    ))
+
+# In[8]:
+
+ 
+def run_cli(args):        
+    # this is the main entry point of this script
+    pedwaiting = []
+    vehwaiting = []
+    sumoBinary = checkBinary('sumo')
+
+    for i in range(args.runs):        
+        # generate the pedestrians for this simulation
+        setup_traci(args, i)
 
         # this is the normal way of using traci. sumo is started as a
         # subprocess and then the python script connects and runs
-        traci.start([sumoBinary, "-c", os.path.join('run_adapt.sumocfg')])
+        traci.start([sumoBinary, "-c", os.path.join(SUMOCFG_FOLDER, f'run_{args.vehicle}_adapt.sumocfg')])
         [pedestrian_waiting_time, veh_waiting_time] = run()
         pedwaiting.append(pedestrian_waiting_time)
         vehwaiting.append(veh_waiting_time)
         
         print(f"Iteration {i}: {pedestrian_waiting_time = } and {veh_waiting_time = }")
-            
+        
 
 
     # In[9]:
+    totalwaiting = [ped + veh for ped, veh in zip(pedwaiting, vehwaiting)] 
 
+    CONFIG_NAME = f'adapt_data_{args.vehicle}_{args.binomial}_{args.period}'
 
-    with open(f'ped_adapt_data_moderate_{args.binomial}_{args.period}.txt', "w") as file:
+    PED_FILE = os.path.join(DATA_FOLDER, f'ped_{CONFIG_NAME}.txt')
+    VEH_FILE = os.path.join(DATA_FOLDER, f'veh_{CONFIG_NAME}.txt')
+    TOT_FILE = os.path.join(DATA_FOLDER, f'tot_{CONFIG_NAME}.txt')
+
+    with open(PED_FILE, "w") as file:
         for value in pedwaiting:
             file.write(f"{value}\n")
                     
-    with open(f'veh_adapt_data_moderate_{args.binomial}_{args.period}.txt', "w") as file:
+    with open(VEH_FILE, "w") as file:
         for value in vehwaiting:
             file.write(f"{value}\n")
                     
-    totalwaiting = [pedwaiting[i] + vehwaiting[i] for i in range(len(vehwaiting))] 
-    with open(f'total_adapt_data_moderate_{args.binomial}_{args.period}.txt', "w") as file:
+    with open(TOT_FILE, "w") as file:
         for value in totalwaiting:
             file.write(f"{value}\n")
 
@@ -198,25 +215,13 @@ def run_cli(args):
 
 def run_gui(args):
     sumoBinary = checkBinary('sumo-gui')
-    net = 'pedcrossing.net.xml'
         
     # generate the pedestrians for this simulation
-    randomTrips.main(randomTrips.get_options([
-        '--net-file', net,
-        '--output-trip-file', 'pedestrians.trip.xml',
-        '--seed', "42",  # make runs reproducible
-        '--pedestrians',
-        '--prefix', 'ped',
-        '--allow-fringe',
-        # prevent trips that start and end on the same edge
-        '--min-distance', "1",
-        '--trip-attributes', 'departPos="random" arrivalPos="random"',
-        '--binomial', str(args.binomial),
-        '--period', str(args.period)]))
+    setup_traci(args)
 
-        # this is the normal way of using traci. sumo is started as a
-        # subprocess and then the python script connects and runs
-    traci.start([sumoBinary, "-c", os.path.join('run_adapt.sumocfg')])
+    # this is the normal way of using traci. sumo is started as a
+    # subprocess and then the python script connects and runs
+    traci.start([sumoBinary, "-c", os.path.join(SUMOCFG_FOLDER, f'run_{args.vehicle}_adapt.sumocfg')])
     run()
 
 def main():

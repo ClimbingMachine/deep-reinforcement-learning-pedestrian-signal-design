@@ -24,8 +24,8 @@ def get_plot(path: Path, label: str = None):
 def main():
     pass
     # %%
-    FIXED_CONTROL_PATH = os.path.join('Baseline_Fixed_Time_Control', 'total_fixed_data_mod.txt')
-    ADAPT_CONTROL_PATH = os.path.join('Adaptive Pedestrian Signal', 'total_adapt_data_moderate_5_6.txt')
+    FIXED_CONTROL_PATH = os.path.join('Baseline_Fixed_Time_Control', 'data', 'total_fixed_data_mod.txt')
+    ADAPT_CONTROL_PATH = os.path.join('Adaptive Pedestrian Signal', 'data', 'total_adapt_data_moderate_5_6.txt')
     RL_CONTROL_PATH = os.path.join('DeepQLearning', 'saved_models')
     E_GREEDY_PATH = os.path.join(RL_CONTROL_PATH, 'model_egreedy', 'plot_delay_data.txt')
     UCB_PATH = os.path.join(RL_CONTROL_PATH, 'model_ucb', 'plot_delay_data.txt')

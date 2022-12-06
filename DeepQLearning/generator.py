@@ -3,13 +3,21 @@
 
 # In[17]:
 
-
+import os
 import numpy as np
 import math
 import traci  # noqa
 from sumolib import checkBinary  # noqa
 import randomTrips  # noqa
 
+# directory of this script
+CONTROL_FOLDER = 'DeepQLearning'
+DATA_FOLDER = os.path.join(CONTROL_FOLDER, 'Intersection')
+# directory of sumocfg
+SUMOCFG_FOLDER = os.path.join('sumo_config', 'simple_crosswalk')
+# config files for sumo
+NET_FILE = os.path.join(SUMOCFG_FOLDER, 'pedcrossing.net.xml')
+OUTPUT_TRIP_FILE = os.path.join(DATA_FOLDER,'pedestrians.trip.xml')
 
 # In[18]:
 
@@ -23,10 +31,9 @@ class TrafficGenerator:
         """
         Generation of the route of every car for one episode
         """
-        net = "./Intersection/pedcrossing.net.xml"
         randomTrips.main(randomTrips.get_options([
-        '--net-file', net,
-        '--output-trip-file', 'Intersection\pedestrians.trip.xml',
+        '--net-file', NET_FILE,
+        '--output-trip-file', OUTPUT_TRIP_FILE,
         '--seed', str(seed),  # make runs reproducible
         '--pedestrians',
         '--prefix', 'ped',

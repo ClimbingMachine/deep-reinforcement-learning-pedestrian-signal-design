@@ -23,11 +23,15 @@ import traci
 from training_simulation import Simulation
 from training_simulation_exp import SimulationExploration
 from training_simulation_bm import SimulationSoftmax
+from training_simulation_timing import SimulationTiming
 from generator import TrafficGenerator
 from memory import Memory
 from td_learning import TDLearning
 from utils import import_train_configuration, set_sumo, set_train_path
 from visual import Visualization
+
+CONTROL_FOLDER = 'DeepQLearning'
+CONFIG_FILE = os.path.join(CONTROL_FOLDER, 'training_settings.ini')
 
 
 # In[4]:
@@ -35,9 +39,9 @@ from visual import Visualization
 
 if __name__ == "__main__":
 
-    config = import_train_configuration(config_file='training_settings.ini')
+    config = import_train_configuration(config_file=CONFIG_FILE)
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
-    path = set_train_path(config['models_path_name'])
+    path = set_train_path(os.path.join(CONTROL_FOLDER, config['models_path_name']))
 
     Model = TDLearning(
         config['batch_size'], 
@@ -61,7 +65,7 @@ if __name__ == "__main__":
         dpi=96
     )
         
-    Simulation = Simulation(
+    Simulation = SimulationTiming(
         Model,
         Memory,
         TrafficGen,
@@ -92,7 +96,7 @@ if __name__ == "__main__":
 
     Model.save_model(path)
 
-    copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
+    copyfile(src=CONFIG_FILE, dst=os.path.join(path, 'training_settings.ini'))
 
     Visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
     Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')

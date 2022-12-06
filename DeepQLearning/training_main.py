@@ -24,21 +24,24 @@ import traci
 from training_simulation import Simulation
 from training_simulation_bm import SimulationSoftmax
 from training_simulation_exp import SimulationExploration
+from training_simulation_timing import SimulationTiming
 from generator import TrafficGenerator
 from memory import Memory
 from model import TrainModel
 from utils import import_train_configuration, set_sumo, set_train_path
 from visual import Visualization
 
+CONTROL_FOLDER = 'DeepQLearning'
+CONFIG_FILE = os.path.join(CONTROL_FOLDER, 'training_settings.ini')
 
 # In[4]:
 
 
 if __name__ == "__main__":
 
-    config = import_train_configuration(config_file='training_settings.ini')
+    config = import_train_configuration(config_file=CONFIG_FILE)
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
-    path = set_train_path(config['models_path_name'])
+    path = set_train_path(os.path.join(CONTROL_FOLDER, config['models_path_name']))
 
     Model = TrainModel(
         config['num_layers'], 
@@ -64,7 +67,7 @@ if __name__ == "__main__":
         dpi=96
     )
         
-    Simulation = SimulationSoftmax(
+    Simulation = SimulationTiming(
         Model,
         Memory,
         TrafficGen,

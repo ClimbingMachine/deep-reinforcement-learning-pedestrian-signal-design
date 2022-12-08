@@ -1,15 +1,51 @@
-# A1
+# RL Internship
 
-## Q1 Agent
+This document details the notes on questions answered and tasks completed.
+
+- [RL Internship](#rl-internship)
+  - [A1](#a1)
+    - [Q1 Agent](#q1-agent)
+    - [Q2 Environment](#q2-environment)
+    - [Q3/4 MDP](#q34-mdp)
+      - [State](#state)
+      - [Action](#action)
+      - [Reward](#reward)
+      - [Transition Model](#transition-model)
+    - [Q5 Experiment Design](#q5-experiment-design)
+    - [Q6 Why DQN?](#q6-why-dqn)
+    - [Tasks](#tasks)
+    - [Installing CUDA](#installing-cuda)
+  - [A2](#a2)
+    - [Q1 Experience Replay](#q1-experience-replay)
+    - [Q2 $\\epsilon$-greedy Policy](#q2-epsilon-greedy-policy)
+    - [Q3 Other Policies](#q3-other-policies)
+    - [Exploration Function](#exploration-function)
+      - [Softmax Policy](#softmax-policy)
+    - [Q4 Pedestrian/Vehicle Arrival](#q4-pedestrianvehicle-arrival)
+    - [Q5 LQR or Deep RL?](#q5-lqr-or-deep-rl)
+      - [Backwards recursion](#backwards-recursion)
+      - [Forward recursion](#forward-recursion)
+    - [Q6 Optimizers](#q6-optimizers)
+    - [Tasks](#tasks-1)
+    - [Misc](#misc)
+  - [Policy Results](#policy-results)
+  - [Future Directions](#future-directions)
+  - [SUMO-RL](#sumo-rl)
+
+## A1
+
+First set of questions.
+
+### Q1 Agent
 Signal Controller
 
-## Q2 Environment
+### Q2 Environment
 SUMO
 
-## Q3/4 MDP
+### Q3/4 MDP
 MDP can be represented by the tuple $(S,A,R,T)$ - States, Actions, Reward, Transition Model
 
-### State
+#### State
 $$
 s \in S_{ped} \times S_{veh}
 $$
@@ -25,13 +61,13 @@ In training, one-hot encoding representation is used.
 * Q: Why values $\geq 9$ lumped together?
 * A: From real data, $s_{ped}, s_{veh} \geq 9$ is rare.
 
-### Action
+#### Action
 2 actions - {Pedestrian Green, Vehicle Green}
 
 * Q: Can timing of light change be included in action?
 * A: Yes. This will cause the action space to grow as well.
 
-### Reward
+#### Reward
 Total Cummulative Wait Time (TCWT)
 
 $$
@@ -44,10 +80,10 @@ $$
 
 Reward is the decrease in TCWT between time steps.s
 
-### Transition Model
+#### Transition Model
 Unknown, simulated by SUMO.
 
-## Q5 Experiment Design
+### Q5 Experiment Design
 Hyperparameters
 
 $$
@@ -68,7 +104,7 @@ Compare with baseline controls
 1. Fixed time control
 2. Actuated pedestrian control
 
-## Q6 Why DQN? 
+### Q6 Why DQN? 
 Is DQN necessary given state representation? (no)
 
 DQN is used when the state space is big, 
@@ -80,7 +116,7 @@ corresponding to all state-action pairs.
 
 Q-Learning can be used, and more actions can be added.
 
-## Tasks
+### Tasks
 - [x] Setup SUMO
 - [x] Briefly read `traci`
 - [x] Read 2.2.3 Dissertation on Control Types
@@ -95,7 +131,7 @@ Q-Learning can be used, and more actions can be added.
 * Q: How is the vehicle arrival rate configured?
 * A: In `pedcrossing.rou.xml`.
 
-## Installing CUDA
+### Installing CUDA
 
 Prerequisite: `conda`, NVIDIA GPU
 
@@ -115,14 +151,14 @@ Follow [installation guide](https://docs.nvidia.com/cuda/cuda-installation-guide
     pip install tensorflow tensorflow-gpu
     ```
     
-# A2
+## A2
 
-## Q1 Experience Replay
+### Q1 Experience Replay
 
 Used to stabilise training, with more efficient use of previous experience.
 Reduces noise and variance in training, converges better.
 
-## Q2 $\epsilon$-greedy Policy
+### Q2 $\epsilon$-greedy Policy
 
 Covers the exploration-exploitation trade-off in RL.
 Choose the greedy action with probability $1-\epsilon$,
@@ -139,7 +175,7 @@ $$
 
 where e is the current episode, and E is the total number of episodes trained.
 
-## Q3 Other Policies
+### Q3 Other Policies
 
 ### Exploration Function
 Use exploration function $r^+$ with bonus $\mathcal{B}$
@@ -161,7 +197,7 @@ $$
 \mathcal{B}(N(s))=\sqrt{\frac{2\ln n}{N(s)}}
 $$
 
-### Softmax Policy
+#### Softmax Policy
 Use softmax policy, given the Q-value function $Q_\theta(s,a)$
 
 $$
@@ -170,7 +206,7 @@ $$
 
 Sample action $a\sim\pi_\theta(s,a)$.
 
-## Q4 Pedestrian/Vehicle Arrival
+### Q4 Pedestrian/Vehicle Arrival
 
 Number of pedestrians at each time step modelled as binomial distribution, 
 with a maximum number n, and probability p of each pedestrian appearing.
@@ -181,14 +217,34 @@ with arrival rate $\lambda$.
 Moderate pedestrians setting has $n=5,p=1/6$.
 Moderate vehicles setting has $\lambda=0.35/s$
 
-## Q5 LQR or Deep RL?
+### Q5 LQR or Deep RL?
 
 LQR is model-based RL. 
 It requires the dynamics of the environment to be known.
 
 Deep RL is typically model-free, where the transition model of the environment is unknown.
 
-## Q6 Optimizers
+#### Backwards recursion
+
+```math
+Q_t = C_t + F_t^T V_{t+1} F_t\\  
+q_t = F_t^T V_{t+1} f_t + F_t^T v_{t+1}\\  
+K_t = -Q_{u_t, u_t}^{-1} Q_{u_t, x_t}\\
+k_t = -Q_{u_t, u_t}^{-1} q_{u_t}\\  
+V_t = Q_{x_t, x_t} + Q_{x_t, u_t} K_t + K_t^T Q_{u_t, x_t} + K_t^T Q_{u_t, u_t} K_t\\  
+v_t = q_{x_t} + Q_{x_t, u_t} k_t + K_t^T Q_{u_t} + K_t^T Q_{u_t, u_t} k_t
+```
+
+where $V_{T+1}=0, v_{T+1}=0$.
+
+#### Forward recursion
+
+```math
+u_t = K_t x_t + k_t\\  
+x_{t+1} = f(x_t, u_t)
+```
+
+### Q6 Optimizers
 
 Optimizers and their hyperparameters
 * SGD - Learning Rate, Momentum, Nesterov
@@ -197,21 +253,21 @@ Optimizers and their hyperparameters
 Default SGD sets `momentum=0, nesterov=False`.
 AdaGrad is Adam with $\beta_1=\beta_2=0$.
 
-## Tasks
+### Tasks
 
 - [x] Replicate results & figures
 - [x] Smart Control Strategy for Traffic Signal
-- [ ] Prepare 20 slides - <20 words per slide
-  - [ ] Problem statement
-- [ ] Future Directions
+- [x] Prepare 20 slides - <20 words per slide
+  - [x] Problem statement
+- [x] Future Directionss
 - [ ] LQR Analytical Solution
 
-## Misc
+### Misc
 
 * [nuPlan Challenge](https://www.nuscenes.org/nuplan#challenge)
 * [Jieping Ye](https://scholar.google.com/citations?user=T9AzhwcAAAAJ&hl=en) - Ride-Hailing RL
 
-# Policy Results
+## Policy Results
 
 The plot below shows the TCWT over iterations from Fixed, Adaptive, and RL-trained Controls. Both tabular and Deep RL were investigated, and made use of the 3 types of policy choices in training.
 
@@ -228,3 +284,20 @@ slowing convergence to the more optimal greedy policy.
 Q-Table also performs much faster than DQN, taking 0.06s per iteration compared to 15s. 
 This is as expected, since the neural network takes computation time, 
 as opposed to the TD equation used for tabular learning.
+
+## Future Directions
+
+A few ideas could be used in a future continuation of this project.
+
+| Property      | Description |
+| ----------- | ----------- |
+| Complex Crosswalks      | Implementing more sophisticated crosswalks       |
+| State Space   | Using a more informative state space e.g. types of pedestrians        |
+| Action Space   | Using more actions for the different traffic signals        |
+| Reward   | Expressing other desirable properties in the reward system        |
+| Multi-Agent   | Complementing complex crosswalks by treating the system as having multiple traffic controllers as agents        |
+
+## SUMO-RL
+
+Projects can also be built open the open-source [SUMO-RL](https://github.com/LucasAlegre/sumo-rl).
+The current implementation does not include pedestrians which can be added.

@@ -34,7 +34,7 @@ DATA_FOLDER = os.path.join(CONTROL_FOLDER, 'data')
 SUMOCFG_FOLDER = os.path.join('sumo_config', 'simple_crosswalk')
 # config files for sumo
 NET_FILE = os.path.join(SUMOCFG_FOLDER, 'pedcrossing.net.xml')
-OUTPUT_TRIP_FILE = os.path.join(DATA_FOLDER,'pedestrians.trip.xml')
+OUTPUT_TRIP_FILE = os.path.join(SUMOCFG_FOLDER,'pedestrians.trip.xml')
 
 # minimum green time for the vehicles
 MIN_GREEN_TIME = 25

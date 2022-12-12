@@ -17,7 +17,7 @@ This document details the notes on questions answered and tasks completed.
     - [Installing CUDA](#installing-cuda)
   - [A2](#a2)
     - [Q1 Experience Replay](#q1-experience-replay)
-    - [Q2 $\\epsilon$-greedy Policy](#q2-epsilon-greedy-policy)
+    - [Q2 Epsilon-Greedy Policy](#q2-epsilon-greedy-policy)
     - [Q3 Other Policies](#q3-other-policies)
     - [Exploration Function](#exploration-function)
       - [Softmax Policy](#softmax-policy)
@@ -30,11 +30,13 @@ This document details the notes on questions answered and tasks completed.
     - [Misc](#misc)
   - [Policy Results](#policy-results)
   - [Future Directions](#future-directions)
-  - [SUMO-RL](#sumo-rl)
+    - [SUMO-RL](#sumo-rl)
 
 ## A1
 
 First set of questions.
+
+![RL](diagrams/RL_framework.png)
 
 ### Q1 Agent
 Signal Controller
@@ -43,7 +45,8 @@ Signal Controller
 SUMO
 
 ### Q3/4 MDP
-MDP can be represented by the tuple $(S,A,R,T)$ - States, Actions, Reward, Transition Model
+MDP can be represented by the tuple $(S,A,R,T)$ - States, Actions, Reward, Transition Model.
+Markov assumption is that the next state only depends on the current state and action.
 
 #### State
 $$
@@ -78,7 +81,11 @@ $$
 R_t = TCWT_{t-1} - TCWT_t
 $$
 
-Reward is the decrease in TCWT between time steps.s
+* $p_{ped}$: Number of waiting pedestrians
+* $p_{veh}$: Number of vehicles in queue
+
+Reward is the decrease in TCWT between time steps.
+In other words, less delay means a greater reward.
 
 #### Transition Model
 Unknown, simulated by SUMO.
@@ -101,11 +108,16 @@ Testing with 2 different environment settings
 * A: Other settings not tested yet, can be explored.
 
 Compare with baseline controls
-1. Fixed time control
-2. Actuated pedestrian control
+1. Fixed time control - Cycle between vehicle green (25s), yellow (5s), and pedestrian green (30s)
+1. Actuated pedestrian control
+
+![adaptive](diagrams/adaptive_flow.png)
 
 ### Q6 Why DQN? 
-Is DQN necessary given state representation? (no)
+
+Q-value function maps the state-action pair to a value, and can be described as a "reward-to-go".
+
+Is a Deep Q-Network (DQN) necessary given state representation? (no)
 
 DQN is used when the state space is big, 
 to generalize training on a small subset of the state space, to the entire space.
@@ -158,7 +170,7 @@ Follow [installation guide](https://docs.nvidia.com/cuda/cuda-installation-guide
 Used to stabilise training, with more efficient use of previous experience.
 Reduces noise and variance in training, converges better.
 
-### Q2 $\epsilon$-greedy Policy
+### Q2 Epsilon-Greedy Policy
 
 Covers the exploration-exploitation trade-off in RL.
 Choose the greedy action with probability $1-\epsilon$,
@@ -269,12 +281,13 @@ AdaGrad is Adam with $\beta_1=\beta_2=0$.
 - [x] Prepare 20 slides - <20 words per slide
   - [x] Problem statement
 - [x] Future Directionss
-- [ ] LQR Analytical Solution
+- [x] LQR Analytical Solution
 
 ### Misc
 
 * [nuPlan Challenge](https://www.nuscenes.org/nuplan#challenge)
 * [Jieping Ye](https://scholar.google.com/citations?user=T9AzhwcAAAAJ&hl=en) - Ride-Hailing RL
+* [Bayesian Data Analyis](http://www.stat.columbia.edu/~gelman/book/)
 
 ## Policy Results
 
@@ -294,6 +307,13 @@ Q-Table also performs much faster than DQN, taking 0.06s per iteration compared 
 This is as expected, since the neural network takes computation time, 
 as opposed to the TD equation used for tabular learning.
 
+Although tabular RL is much faster in this simple scenario, 
+it is not as scalable as Deep RL.
+With a significantly larger state space (e.g. modeling an entire city),
+the deep neural network can be a better option to model the Q-value function.
+Policy approximating algorithms, as opposed to the value approximating DQN used here, 
+can also be considered.
+
 ## Future Directions
 
 A few ideas could be used in a future continuation of this project.
@@ -306,7 +326,7 @@ A few ideas could be used in a future continuation of this project.
 | Reward   | Expressing other desirable properties in the reward system        |
 | Multi-Agent   | Complementing complex crosswalks by treating the system as having multiple traffic controllers as agents        |
 
-## SUMO-RL
+### SUMO-RL
 
 Projects can also be built open the open-source [SUMO-RL](https://github.com/LucasAlegre/sumo-rl).
 The current implementation does not include pedestrians which can be added.

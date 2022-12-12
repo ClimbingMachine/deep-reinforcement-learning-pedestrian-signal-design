@@ -21,10 +21,30 @@ def get_plot(path: Path, label: str = None):
     print('Median', np.median(d))
     return d
 
+def plot_data(data, ylim):
+    plt.clf()
+
+    for d, label in data:
+        linestyle = "-" 
+        if "fixed" in label.lower() or "adaptive" in label.lower():
+            linestyle = "dashed"
+        plt.plot(d, label=label, linestyle=linestyle)
+        
+
+    plt.ylim(ylim)
+
+    plt.legend()
+    plt.xlabel("Iterations")
+    plt.ylabel("Total Cumulative Waiting Time")
+    plt.margins(0)
+    plt.title('Control Strategies and Waiting Times')
+    plt.show()
+
+
 def main():
     pass
     # %%
-    FIXED_CONTROL_PATH = os.path.join('Baseline_Fixed_Time_Control', 'data', 'total_fixed_data_mod.txt')
+    FIXED_CONTROL_PATH = os.path.join('Baseline_Fixed_Time_Control', 'data', 'total_fixed_data_mod_5_6.txt')
     ADAPT_CONTROL_PATH = os.path.join('Adaptive Pedestrian Signal', 'data', 'total_adapt_data_moderate_5_6.txt')
     RL_CONTROL_PATH = os.path.join('DeepQLearning', 'saved_models')
     E_GREEDY_PATH = os.path.join(RL_CONTROL_PATH, 'model_egreedy', 'plot_delay_data.txt')
@@ -48,43 +68,36 @@ def main():
 
     combined_data = np.array([e_greedy, ucb_data, softmax, tbl_e_greedy_data, tbl_ucb_data, tbl_softmax_data])
     ylim = [np.min(combined_data), np.max(combined_data)]
-
+    
+    # %%
+    data_to_plot = [(fixed, "Fixed")]
+    plot_data(data_to_plot, ylim)
 
     # %%
-    plt.clf()
-    plt.plot(fixed, label="Fixed", linestyle="dashed")
-    plt.plot(adapt, label="Adaptive", linestyle="dashed")
-
-    plt.plot(e_greedy, label="DQN: ε-Greedy")
-    plt.plot(ucb_data, label="DQN: UCB")
-    plt.plot(softmax, label="DQN: Softmax")
-
-    plt.ylim(ylim)
-
-    plt.legend()
-    plt.xlabel("Iterations")
-    plt.ylabel("Total Cumulative Waiting Time")
-    plt.margins(0)
-    plt.title('Control Strategies and Waiting Times - DQN')
-    plt.show()
+    data_to_plot.append((adapt, "Adaptive"))
+    plot_data(data_to_plot, ylim)
 
     # %%
-    plt.clf()
-    plt.plot(fixed, label="Fixed", linestyle="dashed")
-    plt.plot(adapt, label="Adaptive", linestyle="dashed")
+    dqn_data_to_plot = data_to_plot.copy()
+    dqn_data_to_plot.append((e_greedy, "DQN: Epsilon-Greedy"))
+    plot_data(dqn_data_to_plot, ylim)
 
-    plt.plot(tbl_e_greedy_data, label="Q-Table: ε-Greedy")
-    plt.plot(tbl_ucb_data, label="Q-Table: UCB")
-    plt.plot(tbl_softmax_data, label="Q-Table: Softmax")
+    # %%
+    dqn_data_to_plot.extend([
+        (ucb_data, "DQN: UCB"),
+        (softmax, "DQN: Softmax")
+    ])
+    plot_data(dqn_data_to_plot, ylim)
 
-    plt.ylim(ylim)
+    # %%
+    q_tbl_data_to_plot = data_to_plot.copy()
+    q_tbl_data_to_plot.extend([
+        (tbl_e_greedy_data, "Q-Table: Epsilon-Greedy"), 
+        (tbl_ucb_data, "Q-Table: UCB"),
+        (tbl_softmax_data, "Q-Table: Softmax")
+    ])
+    plot_data(q_tbl_data_to_plot, ylim)
 
-    plt.legend()
-    plt.xlabel("Iterations")
-    plt.ylabel("Total Cumulative Waiting Time")
-    plt.margins(0)
-    plt.title('Control Strategies and Waiting Times - Q-Table')
-    plt.show()
 # %%
 # if __name__ == "__main__":
 #     main()

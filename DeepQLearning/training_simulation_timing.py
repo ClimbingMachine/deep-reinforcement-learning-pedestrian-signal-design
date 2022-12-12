@@ -1,5 +1,6 @@
 """
 Simulation class to include bigger action space including timing of lights
+TODO: Currently not functional
 """
 import timeit
 import traci

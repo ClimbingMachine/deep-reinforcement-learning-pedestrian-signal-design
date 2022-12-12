@@ -1,27 +1,28 @@
 import numpy as np
 import os
 import sys
+from pathlib import Path
 
 class TDLearning:
-    def __init__(self, batch_size, learning_rate, input_dim, output_dim):
+    def __init__(self, batch_size: int, learning_rate: float, input_dim: int, output_dim: int):
         self._input_dim = input_dim
         self._output_dim = output_dim
         self._batch_size = batch_size
         self._learning_rate = learning_rate
         self._q_table = np.zeros((input_dim, output_dim))
 
-    def _get_state_idx(self, state):
+    def _get_state_idx(self, state) -> int:
         lane_group, lane_cell = state
         return 10 * lane_group + lane_cell
 
-    def predict_one(self, state):
+    def predict_one(self, state) -> float:
         """
         Predict the action values from a single state
         """
         state_idx = self._get_state_idx(state)
         return self._q_table[state_idx]
 
-    def predict_batch(self, states):
+    def predict_batch(self, states) -> np.ndarray:
         """
         Predict the action values from a batch of states
         """
@@ -39,7 +40,7 @@ class TDLearning:
         self._q_table[state_idxs] += self._learning_rate * td_delta
 
 
-    def save_model(self, path):
+    def save_model(self, path: Path):
         """
         Save the current model in the folder as npy file
         """
@@ -60,11 +61,11 @@ class TDLearning:
         return self._batch_size
 
 class TDLearningTest(TDLearning):
-    def __init__(self, input_dim, model_path):
+    def __init__(self, input_dim: int, model_path: Path):
         super().__init__(1, 0, input_dim, 1)
         self._q_table = self._load_my_model(model_path)
 
-    def _load_my_model(self, model_folder_path):
+    def _load_my_model(self, model_folder_path: Path) -> np.ndarray:
         """
         Load the model stored in the folder specified by the model number, if it exists
         """

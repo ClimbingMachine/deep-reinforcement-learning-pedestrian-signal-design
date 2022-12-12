@@ -214,7 +214,7 @@ class Simulation:
         """
         WALKINGAREAS = [':C_w0', ':C_w1']
         CROSSINGS = [':C_c0'] 
-        state = np.zeros(self._num_feats)
+        
         halt_EC = traci.edge.getLastStepHaltingNumber("EC")
         halt_WC = traci.edge.getLastStepHaltingNumber("WC")
         # halt_E = traci.edge.getLastStepHaltingNumber("E2TL")
@@ -233,11 +233,6 @@ class Simulation:
                     
         lane_group = min(int(numWaiting), 9)
         
-        # car_position = 10 * lane_group + lane_cell
-        
-        # state[car_position] = 1  # write the position of the car car_id in the state array in the form of "cell occupied"
-        
-        # return state
         # 2 input features instead of one-hot encoding
         return np.array([lane_group, lane_cell])
 

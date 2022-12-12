@@ -4,10 +4,6 @@
 # In[17]:
 
 import os
-import numpy as np
-import math
-import traci  # noqa
-from sumolib import checkBinary  # noqa
 import randomTrips  # noqa
 
 # directory of this script
@@ -44,10 +40,3 @@ class TrafficGenerator:
         '--binomial', str(self._n_peds_generated),
         '--period', str(self._n_period)]))
         
-
-
-# In[ ]:
-
-
-
-

@@ -1,6 +1,7 @@
+""" Simulation class using UCB exploration function"""
+
 from training_simulation import Simulation
 import numpy as np
-from td_learning import TDLearning
 
 class SimulationExploration(Simulation):
     def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_feats, num_actions, training_epochs):
@@ -8,11 +9,11 @@ class SimulationExploration(Simulation):
         self._n_count = np.ones((num_states, num_actions), dtype=int)
         self._t = 1
 
-    def _get_state_idx(self, state):
+    def _get_state_idx(self, state) -> int:
         lane_group, lane_cell = state
         return 10 * lane_group + lane_cell
 
-    def _choose_action(self, state, epsilon):
+    def _choose_action(self, state, epsilon) -> int:
         """
         Choose action according to exploration function
         r+(s,a) = r(s,a) + B(N(s))
@@ -32,6 +33,9 @@ class SimulationExploration(Simulation):
         return action
     
     def run(self, episode, epsilon):
+        """
+        Reset counters for the exploration function in each episode
+        """
         self._n_count = np.ones((self._num_states, self._num_actions), dtype=int)
         self._t = 1
         return super().run(episode, epsilon)

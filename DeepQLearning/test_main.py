@@ -2,9 +2,13 @@ from test_simulation import SimulationTest
 from generator import TrafficGenerator
 from td_learning import TDLearningTest
 from utils import import_test_configuration, set_sumo, set_test_path
+import os
+
+CONTROL_FOLDER = 'DeepQLearning'
+CONFIG_FILE = os.path.join(CONTROL_FOLDER, 'test_settings.ini')
 
 def main():
-    config = import_test_configuration(config_file='test_settings.ini')
+    config = import_test_configuration(config_file=CONFIG_FILE)
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     model_folder_path, plot_path = set_test_path(config['models_path_name'], config['model_to_test'])
 

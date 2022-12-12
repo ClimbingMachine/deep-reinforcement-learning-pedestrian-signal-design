@@ -12,10 +12,8 @@ from __future__ import print_function
 
 
 import os
-os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 import datetime
 from shutil import copyfile
-import traci
 
 
 # In[3]:
@@ -84,13 +82,16 @@ if __name__ == "__main__":
     
     episode = 0
     timestamp_start = datetime.datetime.now()
-    
-    while episode < config['total_episodes']:
-        print('\n----- Episode', str(episode+1), 'of', str(config['total_episodes']))
-        epsilon = 1.0 - (episode / config['total_episodes'])  # set the epsilon for this episode according to epsilon-greedy policy
-        simulation_time, training_time = Simulation.run(episode, epsilon)  # run the simulation
-        print('Simulation time:', simulation_time, 's - Training time:', training_time, 's - Total:', round(simulation_time+training_time, 1), 's')
-        episode += 1
+    total_episodes = config['total_episodes']
+
+    for episode in range(total_episodes):
+        print(f'\n----- {episode = } of {total_episodes}')
+        # set the epsilon for this episode according to epsilon-greedy policy
+        epsilon = 1.0 - (episode / total_episodes) 
+        # run the simulation
+        simulation_time, training_time = Simulation.run(episode, epsilon) 
+        total_time = round(simulation_time + training_time, 2)
+        print(f'{simulation_time=}s - {training_time=}s - {total_time=}s')
 
     print("\n----- Start time:", timestamp_start)
     print("----- End time:", datetime.datetime.now())

@@ -8,7 +8,6 @@ class SimulationTest(Simulation):
 
     def run(self, episode, epsilon=0):
         """execute the TraCI control loop"""
-        # start_time = timeit.default_timer()
 
         # first, generate the route file for this simulation and set up sumo
         self._TrafficGen.generate_tripfile(seed=str(episode))
@@ -22,8 +21,6 @@ class SimulationTest(Simulation):
         self._sum_neg_reward = 0
         self._sum_queue_length = 0
         self._sum_waiting_time = 0
-        # old_total_wait = 0
-        # old_state = -1
         old_action = -1
 
         # main loop. do something every simulation step until no more vehicles are
@@ -45,11 +42,7 @@ class SimulationTest(Simulation):
             self._set_green_phase(action)
             self._simulate(self._green_duration)
 
-            # saving variables for later & accumulate reward
-            old_state = current_state
+            # saving variables for later
             old_action = action
-
-            # decide wether there is a waiting pedestrian and switch if the green
-            # phase for the vehicles exceeds its minimum duration
             
         traci.close()

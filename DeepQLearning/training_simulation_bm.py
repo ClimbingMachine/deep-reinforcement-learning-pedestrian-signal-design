@@ -1,3 +1,5 @@
+""" Simulation class using softmax policy """
+
 from training_simulation import Simulation
 import numpy as np
 
@@ -5,7 +7,7 @@ class SimulationSoftmax(Simulation):
     def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_feats, num_actions, training_epochs):
         super().__init__(Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_feats, num_actions, training_epochs)
 
-    def _choose_action(self, state, epsilon):
+    def _choose_action(self, state, epsilon) -> int:
         """
         Choose action according to softmax (a.k.a. Boltzmann) policy
         """

@@ -19,7 +19,7 @@ This document details the notes on questions answered and tasks completed.
     - [Q1 Experience Replay](#q1-experience-replay)
     - [Q2 Epsilon-Greedy Policy](#q2-epsilon-greedy-policy)
     - [Q3 Other Policies](#q3-other-policies)
-    - [Exploration Function](#exploration-function)
+      - [Exploration Function](#exploration-function)
       - [Softmax Policy](#softmax-policy)
     - [Q4 Pedestrian/Vehicle Arrival](#q4-pedestrianvehicle-arrival)
     - [Q5 LQR or Deep RL?](#q5-lqr-or-deep-rl)
@@ -189,7 +189,7 @@ where e is the current episode, and E is the total number of episodes trained.
 
 ### Q3 Other Policies
 
-### Exploration Function
+#### Exploration Function
 Use exploration function $r^+$ with bonus $\mathcal{B}$
 where $N(s)$ is the number of times state s is visited in the episode.
 
@@ -235,6 +235,8 @@ LQR is model-based RL.
 It requires the dynamics of the environment to be known.
 
 Deep RL is typically model-free, where the transition model of the environment is unknown.
+
+Below is the analytical recursive solution using LQR.
 
 #### Backwards recursion
 

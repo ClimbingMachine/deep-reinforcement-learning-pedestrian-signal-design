@@ -21,7 +21,7 @@ PHASE_VEH_YELLOW = 3
 
 
 class Simulation:
-    def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
+    def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_feats, num_actions, training_epochs):
         self._Model = Model
         self._Memory = Memory
         self._TrafficGen = TrafficGen
@@ -32,6 +32,7 @@ class Simulation:
         self._green_duration = green_duration
         self._yellow_duration = yellow_duration
         self._num_states = num_states
+        self._num_feats = num_feats
         self._num_actions = num_actions
         self._reward_store = []
         self._cumulative_wait_store = []
@@ -99,13 +100,13 @@ class Simulation:
         self._save_episode_stats()
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
         traci.close()
-        simulation_time = round(timeit.default_timer() - start_time, 1)
+        simulation_time = round(timeit.default_timer() - start_time, 3)
 
         print("Training...")
         start_time = timeit.default_timer()
         for _ in range(self._training_epochs):
             self._replay()
-        training_time = round(timeit.default_timer() - start_time, 1)
+        training_time = round(timeit.default_timer() - start_time, 3)
 
         return simulation_time, training_time
 
@@ -213,32 +214,14 @@ class Simulation:
         """
         WALKINGAREAS = [':C_w0', ':C_w1']
         CROSSINGS = [':C_c0'] 
-        state = np.zeros(self._num_states)
+        
         halt_EC = traci.edge.getLastStepHaltingNumber("EC")
         halt_WC = traci.edge.getLastStepHaltingNumber("WC")
         # halt_E = traci.edge.getLastStepHaltingNumber("E2TL")
         # halt_W = traci.edge.getLastStepHaltingNumber("W2TL")
         queue_length = halt_EC + halt_WC
-        if queue_length < 1:
-            lane_cell = 0
-        elif queue_length < 2:
-            lane_cell = 1
-        elif queue_length < 3:
-            lane_cell = 2
-        elif queue_length < 4:
-            lane_cell = 3
-        elif queue_length < 5:
-            lane_cell = 4
-        elif queue_length < 6:
-            lane_cell = 5
-        elif queue_length < 7:
-            lane_cell = 6
-        elif queue_length < 8:
-            lane_cell = 7
-        elif queue_length < 9:
-            lane_cell = 8
-        else:
-            lane_cell = 9
+
+        lane_cell = min(int(queue_length), 9)
         
         numWaiting = 0
         for edge in WALKINGAREAS:
@@ -248,41 +231,10 @@ class Simulation:
                     traci.person.getNextEdge(ped) in CROSSINGS):
                     numWaiting = traci.trafficlight.getServedPersonCount("C", PHASE_PED_GREEN)
                     
-        if numWaiting < 1:
-            lane_group = 0
-        elif numWaiting < 2:
-            lane_group = 1
-        elif numWaiting < 3:
-            lane_group = 2
-        elif numWaiting < 4:
-            lane_group = 3
-        elif numWaiting < 5:
-            lane_group = 4
-        elif numWaiting < 6:
-            lane_group = 5
-        elif numWaiting < 7:
-            lane_group = 6
-        elif numWaiting < 8:
-            lane_group = 7
-        elif numWaiting < 9:
-            lane_group = 8
-        else:
-            lane_group = 9
+        lane_group = min(int(numWaiting), 9)
         
-        valid_car = True
-        if lane_group >= 1:
-            car_position = int(str(lane_group) + str(lane_cell))  # composition of the two postion ID to create a number in interval 0-79
-        
-        elif lane_group == 0:
-            car_position = lane_cell     
-        
-        else:
-            valid_car = False        # flag for not detecting cars crossing the intersection or driving away from it
-        
-        if valid_car:
-            state[car_position] = 1  # write the position of the car car_id in the state array in the form of "cell occupied"
-        
-        return state
+        # 2 input features instead of one-hot encoding
+        return np.array([lane_group, lane_cell])
 
 
     def _replay(self):
@@ -294,13 +246,13 @@ class Simulation:
         if len(batch) > 0:  # if the memory is full enough
             states = np.array([val[0] for val in batch])  # extract states from the batch
             next_states = np.array([val[3] for val in batch])  # extract next states from the batch
-
+            
             # prediction
             q_s_a = self._Model.predict_batch(states)  # predict Q(state), for every sample
             q_s_a_d = self._Model.predict_batch(next_states)  # predict Q(next_state), for every sample
 
             # setup training arrays
-            x = np.zeros((len(batch), self._num_states))
+            x = np.zeros((len(batch), self._num_feats), dtype=int)
             y = np.zeros((len(batch), self._num_actions))
 
             for i, b in enumerate(batch):

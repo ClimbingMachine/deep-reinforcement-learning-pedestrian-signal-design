@@ -12,39 +12,41 @@ from __future__ import print_function
 
 
 import os
-os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 import datetime
 from shutil import copyfile
-import traci
 
 
 # In[3]:
 
 
-import import_ipynb
 from training_simulation import Simulation
+from training_simulation_bm import SimulationSoftmax
+from training_simulation_exp import SimulationExploration
+from training_simulation_timing import SimulationTiming
 from generator import TrafficGenerator
 from memory import Memory
 from model import TrainModel
 from utils import import_train_configuration, set_sumo, set_train_path
 from visual import Visualization
 
+CONTROL_FOLDER = 'DeepQLearning'
+CONFIG_FILE = os.path.join(CONTROL_FOLDER, 'training_settings.ini')
 
 # In[4]:
 
 
 if __name__ == "__main__":
 
-    config = import_train_configuration(config_file='training_settings.ini')
+    config = import_train_configuration(config_file=CONFIG_FILE)
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
-    path = set_train_path(config['models_path_name'])
+    path = set_train_path(os.path.join(CONTROL_FOLDER, config['models_path_name']))
 
     Model = TrainModel(
         config['num_layers'], 
         config['width_layers'], 
         config['batch_size'], 
         config['learning_rate'], 
-        input_dim=config['num_states'], 
+        input_dim=config['num_feats'], 
         output_dim=config['num_actions']
     )
 
@@ -63,7 +65,7 @@ if __name__ == "__main__":
         dpi=96
     )
         
-    Simulation = Simulation(
+    Simulation = SimulationTiming(
         Model,
         Memory,
         TrafficGen,
@@ -73,19 +75,23 @@ if __name__ == "__main__":
         config['green_duration'],
         config['yellow_duration'],
         config['num_states'],
+        config['num_feats'],
         config['num_actions'],
         config['training_epochs']
     )
     
     episode = 0
     timestamp_start = datetime.datetime.now()
-    
-    while episode < config['total_episodes']:
-        print('\n----- Episode', str(episode+1), 'of', str(config['total_episodes']))
-        epsilon = 1.0 - (episode / config['total_episodes'])  # set the epsilon for this episode according to epsilon-greedy policy
-        simulation_time, training_time = Simulation.run(episode, epsilon)  # run the simulation
-        print('Simulation time:', simulation_time, 's - Training time:', training_time, 's - Total:', round(simulation_time+training_time, 1), 's')
-        episode += 1
+    total_episodes = config['total_episodes']
+
+    for episode in range(total_episodes):
+        print(f'\n----- {episode = } of {total_episodes}')
+        # set the epsilon for this episode according to epsilon-greedy policy
+        epsilon = 1.0 - (episode / total_episodes) 
+        # run the simulation
+        simulation_time, training_time = Simulation.run(episode, epsilon) 
+        total_time = round(simulation_time + training_time, 2)
+        print(f'{simulation_time=}s - {training_time=}s - {total_time=}s')
 
     print("\n----- Start time:", timestamp_start)
     print("----- End time:", datetime.datetime.now())

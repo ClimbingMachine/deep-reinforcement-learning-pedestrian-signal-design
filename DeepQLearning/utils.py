@@ -9,7 +9,6 @@ from sumolib import checkBinary
 import os
 import sys
 
-SUMOCFG_FOLDER = os.path.join('sumo_config', 'simple_crosswalk')
 
 # In[1]:
 
@@ -36,7 +35,6 @@ def import_train_configuration(config_file):
     config['memory_size_min'] = content['memory'].getint('memory_size_min')
     config['memory_size_max'] = content['memory'].getint('memory_size_max')
     config['num_states'] = content['agent'].getint('num_states')
-    config['num_feats'] = content['agent'].getint('num_feats')
     config['num_actions'] = content['agent'].getint('num_actions')
     config['gamma'] = content['agent'].getfloat('gamma')
     config['models_path_name'] = content['dir']['models_path_name']
@@ -59,11 +57,10 @@ def import_test_configuration(config_file):
     config['green_duration'] = content['simulation'].getint('green_duration')
     config['yellow_duration'] = content['simulation'].getint('yellow_duration')
     config['num_states'] = content['agent'].getint('num_states')
-    config['num_feats'] = content['agent'].getint('num_feats')
     config['num_actions'] = content['agent'].getint('num_actions')
     config['sumocfg_file_name'] = content['dir']['sumocfg_file_name']
     config['models_path_name'] = content['dir']['models_path_name']
-    config['model_to_test'] = content['dir']['model_to_test']
+    config['model_to_test'] = content['dir'].getint('model_to_test') 
     return config
 
 
@@ -85,7 +82,7 @@ def set_sumo(gui, sumocfg_file_name, max_steps):
         sumoBinary = checkBinary('sumo-gui')
  
     # setting the cmd command to run sumo at simulation time
-    sumo_cmd = [sumoBinary, "-c", os.path.join(SUMOCFG_FOLDER, sumocfg_file_name), "--no-step-log", "true", "--waiting-time-memory", str(max_steps)]
+    sumo_cmd = [sumoBinary, "-c", os.path.join('Intersection', sumocfg_file_name), "--no-step-log", "true", "--waiting-time-memory", str(max_steps)]
 
     return sumo_cmd
 
@@ -113,8 +110,8 @@ def set_test_path(models_path_name, model_n):
     """
     Returns a model path that identifies the model number provided as argument and a newly created 'test' path
     """
-    model_folder_path = os.path.join(os.getcwd(), models_path_name, f'model_{model_n}')
-    
+    model_folder_path = os.path.join(os.getcwd(), models_path_name, 'model_'+str(model_n), '')
+
     if os.path.isdir(model_folder_path):    
         plot_path = os.path.join(model_folder_path, 'test', '')
         os.makedirs(os.path.dirname(plot_path), exist_ok=True)

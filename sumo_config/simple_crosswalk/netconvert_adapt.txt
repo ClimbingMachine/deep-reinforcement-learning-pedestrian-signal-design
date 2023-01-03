@@ -1,1 +1,0 @@
-netconvert --node-files=pedcrossing.nod.xml --edge-files=pedcrossing.edg.xml --connection-files=pedcrossing.con.xml --tllogic-files=pedcrossing_adapt.tll.xml --output-file=pedcrossing_adapt.net.xml
